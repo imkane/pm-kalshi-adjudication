@@ -1,0 +1,72 @@
+{
+  "_README": [
+    "Schema example for data/text_verdicts.json, which walk_hedge.py reads.",
+    "Every entry below is SYNTHETIC. The tickers, ids and reasons are invented to show the",
+    "shape of the file; none of them are real adjudications and none are the ones behind the",
+    "3-of-30 result in the README.",
+    "",
+    "Key format: '<KALSHI_TICKER>|<POLYMARKET_MARKET_ID>'.",
+    "",
+    "verdict is one of:",
+    "  same_contract           Kalshi YES settles identically to Polymarket YES.",
+    "  same_contract_inverted  Kalshi YES settles identically to Polymarket NO. The two venues",
+    "                          framed the question as complements, so the hedge sits on the",
+    "                          same nominal side of both books.",
+    "  different_contract      Not the same instrument. Never walked.",
+    "  unreadable              Published rule text is incomplete or templated. Fails closed.",
+    "",
+    "walk_hedge.py only walks same_contract and same_contract_inverted. Anything else is",
+    "ignored, and an unrecognised verdict string is ignored rather than guessed at.",
+    "",
+    "'why' is free text and is not parsed. Write down the settlement clause that decided it;",
+    "a verdict you cannot re-derive from the rule text six months later is not an audit trail.",
+    "",
+    "Delete this _README key in your own file, or leave it: it is skipped because it is not a",
+    "dict with a 'verdict' field."
+  ],
+
+  "KXEXAMPLECUM-27DEC31-T6|900000001": {
+    "verdict": "same_contract_inverted",
+    "why": "Kalshi asks 'at least 6 by 2027-12-31'; PM asks '5 or fewer by 2027-12-31'. Same count, same source, same deadline, complementary framing. Kalshi YES == PM NO.",
+    "kalshi_title": "Will there be at least 6 example events by Dec 31, 2027?",
+    "pm_title": "5 or fewer example events in 2027?",
+    "score_band": "mid",
+    "adjudicated": "2026-08-16"
+  },
+
+  "KXEXAMPLETHRESH-27JUN30|900000002": {
+    "verdict": "same_contract",
+    "why": "Both resolve on the same published figure, same release, same threshold direction, same cutoff timestamp. Rule text agrees clause by clause.",
+    "kalshi_title": "Will the example index exceed 100 by Jun 30, 2027?",
+    "pm_title": "Example index above 100 before July 2027?",
+    "score_band": "mid",
+    "adjudicated": "2026-08-16"
+  },
+
+  "KXEXAMPLETEMP-26AUG20-B58|900000003": {
+    "verdict": "different_contract",
+    "why": "Titles both say the city name, but Kalshi settles on the airport station and PM settles on the downtown station. Different observations; the gap can exceed the bucket width.",
+    "kalshi_title": "Highest temperature in Example City on Aug 20?",
+    "pm_title": "Example City high temp on August 20?",
+    "score_band": "high",
+    "adjudicated": "2026-08-16"
+  },
+
+  "KXEXAMPLEBUCKET-27MAR31-B58|900000004": {
+    "verdict": "different_contract",
+    "why": "Kalshi is an exclusive bucket (58.0-58.9). PM is cumulative (at least 58). PM still resolves YES at 59.0; Kalshi does not.",
+    "kalshi_title": "Example release between 58.0 and 58.9?",
+    "pm_title": "Example release at least 58?",
+    "score_band": "high",
+    "adjudicated": "2026-08-16"
+  },
+
+  "KXEXAMPLEPLACEHOLDER-27DEC31|900000005": {
+    "verdict": "unreadable",
+    "why": "Published Kalshi rule text is an unpopulated template: 'above || Count || by || Date || at || Time ||'. No external party can confirm the settlement terms, so this fails closed regardless of how well the title matches.",
+    "kalshi_title": "Will the example count exceed the threshold?",
+    "pm_title": "Example count above threshold by end of 2027?",
+    "score_band": "low",
+    "adjudicated": "2026-08-16"
+  }
+}

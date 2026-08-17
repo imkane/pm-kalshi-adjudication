@@ -1,0 +1,11 @@
+# Snapshots, candidate caches and adjudication labels stay local. The labelled verdict file
+# is the work product; see text_verdicts.example.json for its schema.
+data/
+*.sqlite
+*.jsonl
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
