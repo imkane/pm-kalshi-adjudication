@@ -186,9 +186,9 @@ floor whose own documentation notes it "is calibrated to the embedding model in 
 comparable across models," which is an honest statement that the threshold is a tuning parameter
 rather than a correctness boundary.
 
-So the gap here is not that nobody built cross-venue matching. Several people did. It's that
-nobody has published how often it's right, and the only way to produce that number is to hand-read
-resolution text, which is slow, has no product surface, and doesn't sell a venue integration.
+So the point is not that nobody built cross-venue matching. Several people did, and at least one
+built it carefully. The point is that a similarity score and a relation label are different
+claims, and only the second one can be checked against the rules.
 
 ### And one that survives a perfect match: who certifies the outcome
 
@@ -254,9 +254,7 @@ and derived fields linked back to venue records.
 Not access to Polymarket or Kalshi, since their APIs are public. Not a matcher either, since as
 noted above several of those already exist. The valuable part, if any, is correctness: knowing
 which public data is complete, which fields are stale or insufficient, which contracts are
-genuinely equivalent, and which apparent matches fall apart on settlement terms. Put another way,
-the thing missing from this market is not another classifier. It's a labelled set to score one
-against.
+genuinely equivalent, and which apparent matches fall apart on settlement terms.
 
 Before building more, I want to hear about a real use case. Open an issue, or reach me on Reddit
 at [/u/kwm](https://www.reddit.com/user/kwm/).
