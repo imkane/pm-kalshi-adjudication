@@ -155,6 +155,41 @@ Some Kalshi markets publish rule templates with placeholders left blank. The con
 normal internally, but when the public rule text just says `above || Count || by || Date || at ||
 Time ||`, there's nothing an external matcher can do except fail closed.
 
+### Embeddings don't fix this, and here's a documented case
+
+An obvious objection to everything above is that IDF-weighted title overlap is a crude matcher, and
+that a semantic model would not make these mistakes. I checked what the commercial feeds actually
+do, because if the problem were solved I would rather find that out now.
+
+Five vendors sell normalized cross-venue prediction-market data: PMXT, Dome, Adjacent News,
+PolyRouter, and Probalytics. Of those, one ships general relation classification. PMXT's SDK
+defines a closed `MatchRelation` literal of identity, complement, subset, superset, overlap and
+disjoint, with a `confidence` float and a `reasoning` string alongside it. Dome and PolyRouter
+solve matching for sports and only sports. PolyRouter and Probalytics otherwise do schema
+unification, which is making the fields line up rather than deciding whether two contracts ask the
+same question. None of the five publishes an accuracy figure.
+
+Adjacent News is the instructive one, because its documentation shows the failure directly. Their
+similar-markets endpoint ranks on cosine similarity over embeddings, not string overlap. The sample
+response in their published API docs answers one query with two Kalshi contracts: New York winning
+the 2026 basketball finals at `similarity: 0.91`, and Boston winning the same finals at `0.88`.
+
+Those two contracts are mutually exclusive. Both cannot resolve Yes. They score as near-identical
+because they are the same instrument template with one field changed, which is exactly what an
+embedding is built to notice and exactly the wrong thing to notice here.
+
+That is a documentation example rather than a measured error rate, and I have not run their API, so
+I'm not presenting it as their accuracy. It is worth showing anyway, because it is what the vendor
+chose as the illustration of the feature behaving correctly, and it reproduces the same inversion
+that took out all ten of my high-similarity pairs. The endpoint also exposes a configurable cosine
+floor whose own documentation notes it "is calibrated to the embedding model in use and is not
+comparable across models," which is an honest statement that the threshold is a tuning parameter
+rather than a correctness boundary.
+
+So the gap here is not that nobody built cross-venue matching. Several people did. It's that
+nobody has published how often it's right, and the only way to produce that number is to hand-read
+resolution text, which is slow, has no product surface, and doesn't sell a venue integration.
+
 ### And one that survives a perfect match: who certifies the outcome
 
 Every failure above is a reason two contracts are not the same question. There's one more that
@@ -193,7 +228,8 @@ long-dated, tie up capital, and are limited by fees.
 ## What a usable data layer has to track
 
 Most cross-venue work treats the venue API as the source of truth and uses the title as the join
-key. That's not enough. At a minimum, you need:
+key, or an embedding of the title, which is the same key with better manners. That's not enough.
+At a minimum, you need:
 
 - venue-specific pagination and universe boundaries
 - fee schedules by market or series
@@ -215,9 +251,12 @@ I'm thinking about packaging the audited layer behind this work: cross-venue mat
 the reason attached, resolution-text fingerprints, fee schedules, source and station diagnostics,
 and derived fields linked back to venue records.
 
-Not access to Polymarket or Kalshi, since their APIs are public. The valuable part, if any, is
-correctness: knowing which public data is complete, which fields are stale or insufficient, which
-contracts are genuinely equivalent, and which apparent matches fall apart on settlement terms.
+Not access to Polymarket or Kalshi, since their APIs are public. Not a matcher either, since as
+noted above several of those already exist. The valuable part, if any, is correctness: knowing
+which public data is complete, which fields are stale or insufficient, which contracts are
+genuinely equivalent, and which apparent matches fall apart on settlement terms. Put another way,
+the thing missing from this market is not another classifier. It's a labelled set to score one
+against.
 
 Before building more, I want to hear about a real use case. Open an issue, or reach me on Reddit
 at [/u/kwm](https://www.reddit.com/user/kwm/).
